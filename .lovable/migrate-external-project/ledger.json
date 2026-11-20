@@ -1,10 +1,11 @@
 [
- {"capability":"code","source":"GitHub addhrr12345-afk/banquet-bites-decision-wheel: routes, components, public/menu photos, assets, tests, cark.html, configs","outcome":"copy","status":"in_progress","next_action":"Copy all files except .git and .env"},
- {"capability":"schema","source":"drizzle/migrations 0000-0007 (menu, comments, wheel, social, spin functions)","outcome":"migrate","status":"pending","next_action":"Apply migrations to Lovable Cloud"},
- {"capability":"records","source":"Seed data in migrations 0000/0001/0002","outcome":"migrate","status":"pending","next_action":"Apply with migrations"},
+ {"capability":"code","source":"GitHub addhrr12345-afk/banquet-bites-decision-wheel: routes, components, public/menu photos, assets, tests, cark.html, Vercel/Netlify config, roadmap, AGENTS.md","outcome":"copy","status":"verified","next_action":"none"},
+ {"capability":"schema","source":"drizzle/migrations 0000-0007 applied byte-identical","outcome":"migrate","status":"verified","next_action":"none"},
+ {"capability":"records","source":"Seed data: 11 categories, 53 items, wheel defaults, 3 social rows","outcome":"migrate","status":"verified","next_action":"none"},
  {"capability":"live records not in repo","source":"Edits, guest comments, prize codes, social links stored only in the old backend","outcome":"migrate","status":"pending","next_action":"User exports CSV/JSON from the old project if needed"},
- {"capability":"file storage","source":"Private menu-photos bucket","outcome":"migrate","status":"pending","next_action":"Create bucket in Lovable Cloud"},
- {"capability":"uploaded photos in old storage","source":"Old menu-photos bucket files","outcome":"migrate","status":"pending","next_action":"Re-upload custom photos if any"},
+ {"capability":"file storage","source":"Private menu-photos bucket (2MB, server-only access)","outcome":"migrate","status":"verified","next_action":"none"},
+ {"capability":"uploaded photos in old storage","source":"Old menu-photos bucket files","outcome":"migrate","status":"pending","next_action":"Repo items use bundled photos; re-upload custom photos from the dashboard if any"},
  {"capability":"auth","source":"None (passwordless dashboard)","outcome":"not needed","status":"accepted","next_action":"none"},
- {"capability":"verification","source":"tests, dashboard, guest menu, wheel","outcome":"verify","status":"pending","next_action":"Run tests and browser checks"}
+ {"capability":"QR cutover","source":"QR targets <published>/menu","outcome":"cutover","status":"pending","next_action":"Publish this project; reprint QR codes if the address changes"},
+ {"capability":"verification","source":"tests 54/54, dashboard, guest menu with 54 images, wheel config + spin","outcome":"verify","status":"verified","next_action":"none"}
 ]
