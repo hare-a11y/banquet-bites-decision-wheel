@@ -57,6 +57,20 @@
       "when": 1795195696293,
       "tag": "0007_wheel_prize_gap_boost",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1795200604895,
+      "tag": "0008_wheel_consolation_prize",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1795200828676,
+      "tag": "0009_wheel_miss_pairs",
+      "breakpoints": true
     }
   ]
 }

@@ -7,6 +7,8 @@ export const prizeSchema = z.object({
   c: z.string().regex(/^#[0-9a-fA-F]{6}$/),
   limit: z.number().int().min(0).max(999).nullable(),
   x: z.boolean().optional(),
+  /** Common consolation prize (unlimited): wins most spins when no daily-limit prize comes out. */
+  f: z.boolean().optional(),
 });
 export const wheelSchema = z.object({
   title: z.string().trim().max(80),
@@ -23,7 +25,7 @@ export const guestWheelSchema = z.object({
   title: z.string(),
   subtitle: z.string(),
   max_spins: z.number().int().min(0),
-  prizes: z.array(prizeSchema.omit({ limit: true })),
+  prizes: z.array(prizeSchema.omit({ limit: true, f: true })),
 });
 export type Prize = z.infer<typeof prizeSchema>;
 export type WheelSettings = z.infer<typeof wheelSchema>;
@@ -74,8 +76,26 @@ export function prizeChance(remaining: number, frac: number, todaySpins: number,
   return Math.min(1, remaining / expectedLeft);
 }
 
-/** Unlimited real prizes win on this share of spins (when the gap allows); the rest land on "Maybe Next Time". */
+/** Other unlimited real prizes win on this share of spins (when the gap allows). */
 export const UNLIMITED_PRIZE_CHANCE = 0.1;
+/**
+ * When no daily-limit prize comes out, "Maybe Next Time" wins this share of spins and the consolation
+ * prize (f) the rest (mirrors spin_wheel). Consolation wins do not reset the gap between prizes.
+ */
+export const MISS_CHANCE = 0.2;
+/** "Maybe Next Time" twice in a row happens about this many times a day, never more. */
+export const DAILY_MISS_PAIRS = 3;
+
+/**
+ * Right after a "Maybe Next Time", chance of another one (mirrors wheel_miss_repeat_chance): pairs still
+ * allowed today divided by the misses still expected today, so pairs spread over the day.
+ */
+export function missRepeatChance(pairsLeft: number, frac: number, todaySpins: number, historyAvg: number | null): number {
+  if (pairsLeft <= 0) return 0;
+  const total = Math.max(todaySpins / Math.max(frac, 0.1), historyAvg ?? 30);
+  const missesLeft = Math.max(Math.max(total * (1 - frac), 1) * MISS_CHANCE, 1);
+  return Math.min(1, pairsLeft / missesLeft);
+}
 
 /**
  * Minimum minutes between two real prizes (mirrors wheel_prize_gap): one hour, shortened only when the

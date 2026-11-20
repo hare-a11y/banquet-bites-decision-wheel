@@ -227,7 +227,10 @@ export type Database = {
           close_hour: number
           close_minute: number
           id: number
+          last_spin_miss: boolean
           max_spins: number
+          miss_pair_day: string | null
+          miss_pairs: number
           open_hour: number
           open_minute: number
           prizes: Json
@@ -239,7 +242,10 @@ export type Database = {
           close_hour?: number
           close_minute?: number
           id?: number
+          last_spin_miss?: boolean
           max_spins?: number
+          miss_pair_day?: string | null
+          miss_pairs?: number
           open_hour?: number
           open_minute?: number
           prizes?: Json
@@ -251,7 +257,10 @@ export type Database = {
           close_hour?: number
           close_minute?: number
           id?: number
+          last_spin_miss?: boolean
           max_spins?: number
+          miss_pair_day?: string | null
+          miss_pairs?: number
           open_hour?: number
           open_minute?: number
           prizes?: Json
@@ -309,6 +318,15 @@ export type Database = {
       }
       wheel_day_fraction: {
         Args: { p_close: number; p_local: string; p_open: number }
+        Returns: number
+      }
+      wheel_miss_repeat_chance: {
+        Args: {
+          p_frac: number
+          p_hist: number
+          p_pairs_left: number
+          p_spins: number
+        }
         Returns: number
       }
       wheel_prize_allowance: {

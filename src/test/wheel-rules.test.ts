@@ -90,7 +90,7 @@ describe("limited prizes: simulated days", () => {
   });
 });
 
-import { prizeGap, prizeGapBoost, UNLIMITED_PRIZE_CHANCE } from "@/lib/wheel-schema";
+import { prizeGap, prizeGapBoost, UNLIMITED_PRIZE_CHANCE, MISS_CHANCE, DAILY_MISS_PAIRS, missRepeatChance } from "@/lib/wheel-schema";
 
 describe("prizes never come in the same hour, except when needed to give them all", () => {
   it("keeps a one-hour gap when there is enough time left", () => {
@@ -139,8 +139,42 @@ describe("owner's setup: 4 free coffees and 2 discounts a day", () => {
     for (let seed = 1; seed <= 300; seed++) if (simulateGapDay(evenly(30, OPEN, CLOSE), 30, seed).length === 6) allGiven++;
     expect(allGiven).toBeGreaterThanOrEqual(290);
   });
-  it("most spins are Maybe Next Time", () => {
+  it("big prizes stay few: at most the 6 limited ones a day", () => {
     const wins = simulateGapDay(evenly(120, OPEN, CLOSE), 120, 7);
     expect(wins.length).toBeLessThanOrEqual(6);
+  });
+});
+
+/** Fallback spins only (no big prize): returns [misses, back-to-back pairs]. */
+function simulateMisses(spins: number, seed: number): [number, number] {
+  let r = seed;
+  const rand = () => ((r = (r * 1103515245 + 12345) % 2147483648) / 2147483648);
+  let misses = 0, pairs = 0, last = false;
+  evenly(spins, OPEN, CLOSE).forEach((m, i) => {
+    const frac = dayFraction(m, OPEN, CLOSE);
+    const chance = last ? missRepeatChance(DAILY_MISS_PAIRS - pairs, frac, i, spins) : MISS_CHANCE;
+    const miss = rand() < chance;
+    if (miss) { misses++; if (last) pairs++; }
+    last = miss;
+  });
+  return [misses, pairs];
+}
+
+describe("when no big prize comes out", () => {
+  it("Maybe Next Time comes 1 in 5 spins, the rest are 10 Birr Off", () => expect(MISS_CHANCE).toBe(0.2));
+  it("Maybe Next Time twice in a row happens at most 3 times a day", () => {
+    for (let seed = 1; seed <= 200; seed++) expect(simulateMisses(120, seed)[1]).toBeLessThanOrEqual(3);
+  });
+  it("on a normal day (120 spins) about 3 back-to-back pairs happen and about 1 in 5 spins is a miss", () => {
+    let pairs = 0, misses = 0;
+    for (let seed = 1; seed <= 200; seed++) { const [m, p] = simulateMisses(120, seed); misses += m; pairs += p; }
+    expect(pairs / 200).toBeGreaterThan(2);
+    expect(misses / (200 * 120)).toBeGreaterThan(0.15);
+    expect(misses / (200 * 120)).toBeLessThan(0.25);
+  });
+  it("no more back-to-back pairs once 3 have happened today", () => expect(missRepeatChance(0, 0.5, 60, 120)).toBe(0));
+  it("guests never see which prize is the most common win", () => {
+    const guest = guestWheelSchema.parse({ title: "", subtitle: "", max_spins: 2, prizes: [{ t: "10 Birr Off", e: "💸", c: "#2f9e44", f: true }] });
+    expect(guest.prizes[0]).not.toHaveProperty("f");
   });
 });

@@ -11,7 +11,7 @@ import { prizeMode, limitForMode, wheelSchema, type Prize, type PrizeMode } from
 const base = "rounded-xl border border-border bg-input px-3.5 py-3 text-base outline-none transition focus:border-primary focus:ring-1 focus:ring-ring sm:text-sm";
 const field = `w-full ${base}`;
 const modes: { id: PrizeMode; label: string; hint: string }[] = [
-  { id: "u", label: "Unlimited", hint: "Wins rarely (about 1 in 10 spins); most spins land on Maybe Next Time." },
+  { id: "u", label: "Unlimited", hint: "Wins rarely (about 1 in 10 spins), unless it is the most common win." },
   { id: "l", label: "Daily limit", hint: "Only the number of people you choose can win today." },
   { id: "z", label: "Display only", hint: "Shown on the wheel but nobody wins." },
 ];
@@ -141,6 +141,10 @@ export function WheelPanel() {
               <span className="w-6 text-center font-semibold text-foreground">{p.limit}</span>
               <Button size="icon" variant="secondary" className="size-8 rounded-full" aria-label="Increase" onClick={() => setPrize(i, { limit: Math.min(999, (p.limit ?? 1) + 1) })}><Plus /></Button>
               people can win today</div> : <span>{modes.find((m) => m.id === mode)?.hint}</span>}
+            {mode === "u" && !p.x && <button type="button" aria-pressed={!!p.f}
+              onClick={() => setDraft({ ...draft, prizes: draft.prizes.map((q, j) => ({ ...q, f: j === i ? !p.f : false })) })}
+              className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${p.f ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground hover:text-foreground"}`}>
+              {p.f ? "Most common win: 4 in 5 spins without a big prize; the rest Maybe Next Time (twice in a row about 3 times a day)" : "Make most common win"}</button>}
             <span className="rounded-full bg-secondary px-2.5 py-1 text-xs">Given today: {wins[p.t] ?? 0}</span>
           </div>
         </article>;
